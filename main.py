@@ -1,3 +1,4 @@
+import os
 from database import engine
 from models import Base
 from fastapi import FastAPI, Depends, Header
@@ -17,7 +18,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 Base.metadata.create_all(bind=engine)
 
-SECRET_KEY = "mysecret"
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
 ALGORITHM = "HS256"
 
 app = FastAPI()
