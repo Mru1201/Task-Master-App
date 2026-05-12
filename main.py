@@ -11,6 +11,9 @@ from models import User as UserModel
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from dotenv import load_dotenv
+
+load_dotenv()
 
 security = HTTPBearer()
 
