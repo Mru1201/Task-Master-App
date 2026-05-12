@@ -11,7 +11,23 @@ function App() {
   const [title, setTitle] = useState("");
   const [tasks, setTasks] = useState([]);
 
-  // // 🔐 LOGIN
+  // 📝 SIGNUP
+  const signup = async () => {
+    const res = await fetch(`${API}/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    });
+  const data = await res.json();
+  if (res.ok) {
+    alert("Signup successful! Please login.");
+  } else {
+    alert(`Signup failed: ${data.detail}`);
+  } 
+};
+  // 🔐 LOGIN
   const login = async () => {
     const res = await fetch(`${API}/login`, {
       method: "POST",
@@ -93,6 +109,7 @@ function App() {
       <br />
 
       <button onClick={login}>Login</button>
+      <button onClick={signup} style={{ marginLeft: 10 }}>Signup</button>
 
       <p><b>Token:</b> {token}</p>
 
