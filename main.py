@@ -12,6 +12,8 @@ from jose import jwt, JWTError
 from datetime import datetime, timedelta
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
+
 
 load_dotenv()
 
@@ -25,6 +27,14 @@ SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
 ALGORITHM = "HS256"
 
 app = FastAPI()
+
+app.add_middleware(
+	CORSMiddleware,
+	allow_origins=["*"],
+	allow_methods=["*"],
+	allow_headers=["*"],
+	allow_credentials=True,
+)
 
 tasks = []
 
