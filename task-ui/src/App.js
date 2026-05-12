@@ -10,6 +10,7 @@ function App() {
   const [token, setToken] = useState("");
   const [title, setTitle] = useState("");
   const [tasks, setTasks] = useState([]);
+  const [isNewUser, setIsNewUser] = useState(false); // New state for toggling UI
 
   // 📝 SIGNUP
   const signup = async () => {
@@ -23,6 +24,7 @@ function App() {
   const data = await res.json();
   if (res.ok) {
     alert("Signup successful! Please login.");
+    setIsNewUser(false); // TO Show login UI after successful signup
   } else {
     alert(`Signup failed: ${data.detail}`);
   } 
@@ -37,7 +39,11 @@ function App() {
       body: JSON.stringify({ username, password }),
     });
     const data = await res.json();
-    setToken(data.acess_token);
+    if (res.ok) {
+      setToken(data.acess_token);
+    } else {
+      alert("Login failed check credentials!");
+    }
   };
    // ➕ CREATE TASK
   const createTask = async () => {
@@ -49,6 +55,8 @@ function App() {
       },
       body: JSON.stringify({ title }),
     });
+    setTitle(""); // Clear input
+    getTasks();   // Refresh list automatically
   };
     
    // 📋 GET TASKS
@@ -60,6 +68,12 @@ function App() {
     });
     const data = await res.json();
     setTasks(data);
+  };
+
+  // 🚪 LOGOUT
+  const logout = () => {
+    setToken("");
+    setTasks([]);
   };
 
   return (
@@ -80,64 +94,70 @@ function App() {
       </header>
     </div>*/
     
-
-   <div style={{ padding: 20 }}>
+<div className="App" style={{ padding: 20, fontFamily: 'sans-serif' }}>
+    <div style={{ maxWidth: 400, margin: '0 auto' }}>
 
       <h1>Task App</h1>
-      <h2>Login</h2>
+      
+      {!token ? (
+        /* --- AUTH VIEW (Login/Signup) --- */
+      <div style={{ maxWidth: '300px', border: '1px solid #ddd', padding: '20px', borderRadius: '8px' }}>
+        <h2>{isNewUser ? "Sign Up" : "Login"}</h2>
+        <input
+            placeholder="username"
+            style={{ width: '100%', marginBottom: '10px' }}
+            onChange={(e) => setUsername(e.target.value)}
+        />
+        <input
+            type="password"
+            placeholder="password"
+            style={{ width: '100%', marginBottom: '10px' }}
+            onChange={(e) => setPassword(e.target.value)}
+        />
+        {isNewUser ? (
+            <button onClick={signup} style={{ width: '100%', padding: '10px', backgroundColor: '#28a745', color: 'white' }}>Register</button>
+        ) : (
+            <button onClick={login} style={{ width: '100%', padding: '10px', backgroundColor: '#007bff', color: 'white' }}>Login</button>
+        )}
+        <p style={{ marginTop: '15px', fontSize: '14px' }}>
+            {isNewUser ? "Already have an account?" : "Need an account?"}
+            <button 
+              onClick={() => setIsNewUser(!isNewUser)} 
+              style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              {isNewUser ? "Login here" : "Sign up here"}
+            </button>
+          </p>
+        </div>
+      ) : (
+        /* --- TASK VIEW --- */
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span>Welcome, <b>{username}</b></span>
+            <button onClick={logout} style={{ backgroundColor: '#dc3545', color: 'white' }}>Logout</button>
+          </div>
+          <hr />
+          <h2>Create Task</h2>
+          <input 
+            value={title}
+            placeholder="New task title..." 
+            onChange={(e) => setTitle(e.target.value)} 
+          />
+          <button onClick={createTask}>Add Task</button>
 
-      <input
-
-        placeholder="username"
-
-        onChange={(e) => setUsername(e.target.value)}
-
-      />
-
-      <br />
-
-      <input
-
-        type="password"
-
-        placeholder="password"
-
-        onChange={(e) => setPassword(e.target.value)}
-
-      />
-
-      <br />
-
-      <button onClick={login}>Login</button>
-      <button onClick={signup} style={{ marginLeft: 10 }}>Signup</button>
-
-      <p><b>Token:</b> {token}</p>
-
-      <hr />
-
-      <h2>Create Task</h2>
-
-      <input onChange={(e) => setTitle(e.target.value)} />
-
-      <button onClick={createTask}>Add Task</button>
-
-      <hr />
-
-      <h2>Tasks</h2>
-
-      <button onClick={getTasks}>Load Tasks</button>
-
-      <ul>
-
-        {tasks.map((t) => (
-
-          <li key={t.id}>{t.title}</li>
-
-        ))}
-
-      </ul>
+          <hr />
+          <h2>Your Tasks</h2>
+          <button onClick={getTasks}>Refresh List</button>
+          <ul>
+            {tasks.map((t) => (
+              <li key={t.id}>{t.title}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
     </div>
+  </div>
 
   );
 }
