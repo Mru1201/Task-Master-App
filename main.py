@@ -21,8 +21,6 @@ security = HTTPBearer()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-Base.metadata.create_all(bind=engine)
-
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
 ALGORITHM = "HS256"
 
@@ -73,6 +71,11 @@ def get_db():
 		yield db
 	finally:
 		db.close()
+
+@app.on_event("startup")
+def startup():
+	import models 
+	models.Base.metadata.create_all(bind=engine)
 
 @app.post("/signup")
 def signup(user: UserCreate, db: Session = Depends(get_db)):
