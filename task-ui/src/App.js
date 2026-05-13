@@ -19,16 +19,6 @@ function App() {
     }
   }, []);
   
-  const getTasks = useCallback(() => {
-  // ... your existing fetch logic
-  }, []);
-  
-  useEffect(() => {
-    if (token) {
-      getTasks();
-    }
-  }, [token, getTasks]);
-
   // 📝 SIGNUP
   const signup = async () => {
     const res = await fetch(`${API}/signup`, {
