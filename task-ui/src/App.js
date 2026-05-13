@@ -58,7 +58,30 @@ function App() {
     setTitle(""); // Clear input
     getTasks();   // Refresh list automatically
   };
-    
+   // Delete Task
+  const deleteTask = async (id) => {
+     await fetch(`${API}/tasks/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    getTasks();   // Refresh list automatically
+  };
+
+  // ✅ UPDATE TASK
+  const updateTask = async (id, newTitle) => {
+     await fetch(`${API}/tasks/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ title: newTitle }),
+    });
+    getTasks();   // Refresh list automatically
+  };  
+
    // 📋 GET TASKS
   const getTasks = async () => {
     const res = await fetch(`${API}/tasks`, {
@@ -150,7 +173,24 @@ function App() {
           <button onClick={getTasks}>Refresh List</button>
           <ul>
             {tasks.map((t) => (
-              <li key={t.id}>{t.title}</li>
+              <li key={t.id}>
+                {t.title}
+
+                {/* DELETE */}
+                <button onClick={() => deleteTask(t.id)} style={{ backgroundColor: '#dc3545', color: 'white', marginLeft: '10px' }}>Delete</button>.
+
+                {/* EDIT */}
+                <button 
+                  onClick={() => {
+                    const newTitle = prompt("Edit task", t.title);
+                    if (newTitle) {
+                        updateTask(t.id, newTitle);
+                    }
+                  }}
+                >
+                  Edit
+                </button>
+              </li>
             ))}
           </ul>
         </div>
