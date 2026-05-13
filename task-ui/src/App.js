@@ -1,7 +1,7 @@
 /*import logo from './logo.svg';
 import './App.css';
 */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 const API = 'https://task-api-46uc.onrender.com';
 
 function App() {
@@ -18,7 +18,16 @@ function App() {
       setToken(savedToken);
     }
   }, []);
-
+  
+  const getTasks = useCallback(() => {
+  // ... your existing fetch logic
+  }, []);
+  
+  useEffect(() => {
+    if (token) {
+      getTasks();
+    }
+  }, [token, getTasks]);
 
   // 📝 SIGNUP
   const signup = async () => {
@@ -102,12 +111,7 @@ function App() {
     const data = await res.json();
     setTasks(data);
   };
-  useEffect(() => {
-    if (token) {
-      getTasks();
-    }
-  }, [token, getTasks]);
-  
+
   // 🚪 LOGOUT
   const logout = () => {
     localStorage.removeItem("token");
