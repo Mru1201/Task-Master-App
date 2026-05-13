@@ -54,14 +54,7 @@ function App() {
       alert("Login failed check credentials!");
     }
   };
-
-  // Autoload tasks after login
-  useEffect(() => {
-    if (token) {
-      getTasks();
-    }
-  }, [token, getTasks]);
-
+  
    // ➕ CREATE TASK
   const createTask = async () => {
      await fetch(`${API}/tasks`, {
