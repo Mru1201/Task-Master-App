@@ -57,7 +57,7 @@ Authorization: Bearer <token>
 
 The frontend communicates with the backend via:
 
-https://your-api.onrender.com
+(https://task-api-46uc.onrender.com)
 
 Make sure to update the API URL in:
 
@@ -71,7 +71,7 @@ src/App.js
 
 You can store API URL in a .env file:
 
-REACT_APP_API_URL=https://your-api.onrender.com
+REACT_APP_API_URL=[https://your-api.onrender.com](https://task-api-46uc.onrender.com)
 
 Then use:
 
@@ -99,13 +99,19 @@ http://localhost:3000
 
 The frontend is deployed on Vercel:
 
-- Live App: https://your-app.vercel.app
+- Live App: [https://your-app.vercel.app](https://task-api-ecru.vercel.app/)
 
 ---
 
 ## 📁 Project Structure
 
-task-ui/ │ ├── src/ │   ├── App.js        # Main UI logic │   └── index.js      # Entry point │ ├── public/ ├── package.json └── README.md
+task-ui/ 
+       │ ├── src/ 
+       │   ├── App.js        # Main UI logic 
+       │   └── index.js      # Entry point 
+       │ ├── public/ 
+       ├ ├── package.json 
+         └── README.md
 
 ---
 
@@ -121,22 +127,7 @@ task-ui/ │ ├── src/ │   ├── App.js        # Main UI logic │   
 
 ## 🚧 Future Improvements
 
-- Persistent login (localStorage)
-- Signup page
 - Better UI (Tailwind / Material UI)
 - Error handling and validation
 - Loading states
-- Task editing and deletion UI
 
----
-
-## 👨‍💻 Author
-
-Your Name  
-GitHub: https://github.com/your-username
-
----
-
-## 📜 License
-
-This project is for educational and portfolio purpos
