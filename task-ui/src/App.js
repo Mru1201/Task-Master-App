@@ -1,7 +1,7 @@
 /*import logo from './logo.svg';
 import './App.css';
 */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 const API = 'https://task-api-46uc.onrender.com';
 
 function App() {
@@ -54,7 +54,7 @@ function App() {
       alert("Login failed check credentials!");
     }
   };
-  
+
    // ➕ CREATE TASK
   const createTask = async () => {
      await fetch(`${API}/tasks`, {
@@ -102,7 +102,12 @@ function App() {
     const data = await res.json();
     setTasks(data);
   };
-
+  useEffect(() => {
+    if (token) {
+      getTasks();
+    }
+  }, [token]);
+  
   // 🚪 LOGOUT
   const logout = () => {
     localStorage.removeItem("token");
