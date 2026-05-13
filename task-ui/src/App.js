@@ -1,7 +1,7 @@
 /*import logo from './logo.svg';
 import './App.css';
 */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 const API = 'https://task-api-46uc.onrender.com';
 
 function App() {
@@ -11,6 +11,14 @@ function App() {
   const [title, setTitle] = useState("");
   const [tasks, setTasks] = useState([]);
   const [isNewUser, setIsNewUser] = useState(false); // New state for toggling UI
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem("token");
+    if (savedToken) {
+      setToken(savedToken);
+    }
+  }, []);
+
 
   // 📝 SIGNUP
   const signup = async () => {
@@ -41,10 +49,19 @@ function App() {
     const data = await res.json();
     if (res.ok) {
       setToken(data.acess_token);
+      localStorage.setItem("token", data.acess_token); // Save token for persistence
     } else {
       alert("Login failed check credentials!");
     }
   };
+
+  // Autoload tasks after login
+  useEffect(() => {
+    if (token) {
+      getTasks();
+    }
+  }, [token]);
+  
    // ➕ CREATE TASK
   const createTask = async () => {
      await fetch(`${API}/tasks`, {
@@ -95,6 +112,7 @@ function App() {
 
   // 🚪 LOGOUT
   const logout = () => {
+    localStorage.removeItem("token");
     setToken("");
     setTasks([]);
   };
