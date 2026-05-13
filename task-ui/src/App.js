@@ -60,8 +60,8 @@ function App() {
     if (token) {
       getTasks();
     }
-  }, [token]);
-  
+  }, [token, getTasks]);
+
    // ➕ CREATE TASK
   const createTask = async () => {
      await fetch(`${API}/tasks`, {
