@@ -101,7 +101,22 @@ function App() {
     const data = await res.json();
     setTasks(data);
   };
-
+  // ✅ TOGGLE COMPLETION
+  const toggleComplete = async (task) => {
+    await fetch(`${API}/tasks/${task.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      // Send the title (required by your backend) and the flipped completed status
+      body: JSON.stringify({ 
+        title: task.title, 
+        completed: !task.completed 
+      }),
+    });
+    getTasks(); // Refresh list 
+  };
   // 🚪 LOGOUT
   const logout = () => {
     localStorage.removeItem("token");
@@ -310,7 +325,22 @@ export default App;
                 ) : (
                   tasks.map((t) => (
                     <li key={t.id} className="group flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-transparent hover:border-indigo-200 hover:bg-white transition-all shadow-sm">
-                      <span className="text-gray-700 font-medium">{t.title}</span>
+        
+                      <div className="flex items-center gap-3">
+                        {/* Checkbox to mark complete */}
+                        <input 
+                          type="checkbox" 
+                          checked={t.completed} 
+                          onChange={() => toggleComplete(t)}
+                          className="h-4 w-4 text-indigo-600 rounded cursor-pointer"
+                        />
+                        
+                        {/* Strike-through text if t.completed is true */}
+                        <span className={`font-medium transition-all ${t.completed ? 'line-through text-gray-400' : 'text-gray-700'}`}>
+                          {t.title}
+                        </span>
+                      </div>
+
                       <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button 
                           onClick={() => {

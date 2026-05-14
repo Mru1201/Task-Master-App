@@ -142,7 +142,7 @@ def mark_complete(task_id: int, user_id: int = Depends(get_current_user), db: Se
 	if not task:
 		return {"error": "Task not found or not yours"}
 
-	task.completed = True 
+	task.completed = not task.completed 
 	db.commit()
  
 	return task
