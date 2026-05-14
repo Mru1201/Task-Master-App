@@ -126,14 +126,15 @@ function App() {
         </a>
       </header>
     </div>*/
-    
-<div className="App" style={{ padding: 20, fontFamily: 'sans-serif' }}>
+  /*  --- Inline style (Object) approach --- */
+  /*
+  <div className="App" style={{ padding: 20, fontFamily: 'sans-serif' }}>
     <div style={{ maxWidth: 400, margin: '0 auto' }}>
 
       <h1>Task App</h1>
       
       {!token ? (
-        /* --- AUTH VIEW (Login/Signup) --- */
+       # --- AUTH VIEW (Login/Signup)
       <div style={{ maxWidth: '300px', border: '1px solid #ddd', padding: '20px', borderRadius: '8px' }}>
         <h2>{isNewUser ? "Sign Up" : "Login"}</h2>
         <input
@@ -163,7 +164,7 @@ function App() {
           </p>
         </div>
       ) : (
-        /* --- TASK VIEW --- */
+        #--- TASK VIEW --- 
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>Welcome, <b>{username}</b></span>
@@ -186,10 +187,10 @@ function App() {
               <li key={t.id}>
                 {t.title}
 
-                {/* DELETE */}
+                { DELETE }
                 <button onClick={() => deleteTask(t.id)} style={{ backgroundColor: '#dc3545', color: 'white', marginLeft: '10px' }}>Delete</button>.
 
-                {/* EDIT */}
+                {  EDIT }
                 <button 
                   onClick={() => {
                     const newTitle = prompt("Edit task", t.title);
@@ -213,3 +214,130 @@ function App() {
 }
 
 export default App;
+*/
+
+/* --- Utility class Tailwind implementation --- */
+
+<div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans">
+    <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
+      {/*HEADER SECTION */ }
+      <div className="bg-indigo-600 p-6 text-white text-center">
+        <h1 className="text-2xl font-bold tracking-tight">Task Master </h1>
+        <p className="text-indigo-100 text-sm">Organize your life, one task at a time.</p>
+      </div>
+
+      <div className="p-8">
+        {!token ? (
+          /* --- AUTH VIEW (Login/Signup) --- */
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold text-gray-800 text-center">
+              {isNewUser ? "Create an Account" : "Welcome Back"}
+            </h2>
+            
+            <div className="space-y-3">
+              <input
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all"
+                placeholder="Username"
+                onChange={(e) => setUsername(e.target.value)}
+              />
+              <input
+                type="password"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all"
+                placeholder="Password"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+
+            {isNewUser ? (
+              <button onClick={signup} className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded-lg transition-colors">
+                Register
+              </button>
+            ) : (
+              <button onClick={login} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg transition-colors">
+                Login
+              </button>
+            )}
+
+            <p className="text-center text-sm text-gray-600 pt-2">
+              {isNewUser ? "Already have an account?" : "Need an account?"}{" "}
+              <button 
+                onClick={() => setIsNewUser(!isNewUser)} 
+                className="text-indigo-600 font-bold hover:underline focus:outline-none"
+              >
+                {isNewUser ? "Login here" : "Sign up here"}
+              </button>
+            </p>
+          </div>
+        ) : (
+           /* --- TASK VIEW --- */
+          <div className="space-y-6">
+             {/* User Profile Info */} 
+            <div className="flex justify-between items-center bg-indigo-50 p-3 rounded-lg">
+              <span className="text-gray-700">Hi, <b className="text-indigo-700">{username}</b></span>
+              <button onClick={logout} className="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1 rounded-full font-semibold transition-colors">
+                Logout
+              </button>
+            </div>
+
+            { /* Create Task Input */ }
+            <div className="space-y-2">
+              <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider">New Task</h3>
+              <div className="flex gap-2">
+                <input 
+                  value={title}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  placeholder="What needs to be done?" 
+                  onChange={(e) => setTitle(e.target.value)} 
+                />
+                <button onClick={createTask} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold transition-transform active:scale-95">
+                  Add
+                </button>
+              </div>
+            </div>
+
+            { /*Task List */}
+            <div className="space-y-3">
+              <div className="flex justify-between items-end border-b pb-2">
+                <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider">Your Tasks</h3>
+                <button onClick={getTasks} className="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+                  Refresh List
+                </button>
+              </div>
+              
+              <ul className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                {tasks.length === 0 ? (
+                  <p className="text-center text-gray-400 py-4 italic text-sm">No tasks yet. Add one above!</p>
+                ) : (
+                  tasks.map((t) => (
+                    <li key={t.id} className="group flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-transparent hover:border-indigo-200 hover:bg-white transition-all shadow-sm">
+                      <span className="text-gray-700 font-medium">{t.title}</span>
+                      <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={() => {
+                            const newTitle = prompt("Edit task", t.title);
+                            if (newTitle) updateTask(t.id, newTitle);
+                          }}
+                          className="p-1 text-yellow-600 hover:bg-yellow-50 rounded"
+                        >
+                          Edit
+                        </button>
+                        <button onClick={() => deleteTask(t.id)} className="p-1 text-red-500 hover:bg-red-50 rounded">
+                          Delete
+                        </button>
+                      </div>
+                    </li>
+                  ))
+                )}
+              </ul>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+  
+  );
+}
+
+export default App;
+
