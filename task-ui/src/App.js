@@ -17,9 +17,14 @@ function App() {
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
+    const savedUsername = localStorage.getItem("username");
     if (savedToken) {
       setToken(savedToken);
     }
+    if (savedUsername) {
+      setUsername(savedUsername);
+    }
+
   }, []);
   
   // 📝 SIGNUP
@@ -56,6 +61,7 @@ function App() {
     if (res.ok) {
       setToken(data.acess_token);
       localStorage.setItem("token", data.acess_token); // Save token for persistence
+      localStorage.setItem("username", username); // Save username for display
     } else {
       setAuthError(data.detail || "Login failed. Check your credentials.");
     }
@@ -142,7 +148,9 @@ function App() {
   // 🚪 LOGOUT
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("username");
     setToken("");
+    setUsername("");
     setTasks([]);
   };
 
