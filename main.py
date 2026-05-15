@@ -1,7 +1,7 @@
 import os
 from database import engine
 from models import Base
-from fastapi import FastAPI, Depends, Header
+from fastapi import FastAPI, Depends, Header, HTTPException, status
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from models import Task as TaskModel
