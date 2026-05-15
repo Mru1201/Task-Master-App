@@ -11,9 +11,11 @@ function App() {
   const [token, setToken] = useState("");
   const [title, setTitle] = useState("");
   const [tasks, setTasks] = useState([]);
-  const [isNewUser, setIsNewUser] = useState(false); // New state for toggling UI
+  const [isNewUser, setIsNewUser] = useState(false); // state for toggling UI
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState("");
+  const [editingID, setEditingID] = useState(null); // state to track which task is being edited
+  const [editText, setEditText] = useState(""); //  state to hold the edited text
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
@@ -383,26 +385,58 @@ export default App;
                           onChange={() => toggleComplete(t)}
                           className="h-4 w-4 text-indigo-600 rounded cursor-pointer"
                         />
-                        
-                        {/* Strike-through text if t.completed is true */}
-                        <span className={`font-medium transition-all ${t.completed ? 'line-through text-gray-400' : 'text-gray-700'}`}>
-                          {t.title}
-                        </span>
+                       
+                        {editingID === t.id ? (
+                          /* --- INLINE EDIT INPUT --- */
+                          <input 
+                            className="flex-1 px-2 py-1 border border-indigo-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                            type="text" 
+                            value={editText} 
+                            onChange={(e) => setEditText(e.target.value)}
+                            autoFocus
+                          />
+                        ) : (
+                          /* Strike-through text if t.completed is true */
+                          <span className={`font-medium transition-all ${t.completed ? 'line-through text-gray-400' : 'text-gray-700'}`}>
+                            {t.title}
+                          </span>
+                        )}
                       </div>
-
-                      <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button 
-                          onClick={() => {
-                            const newTitle = prompt("Edit task", t.title);
-                            if (newTitle) updateTask(t.id, newTitle);
-                          }}
-                          className="p-1 text-yellow-600 hover:bg-yellow-50 rounded"
-                        >
-                          Edit
-                        </button>
-                        <button onClick={() => deleteTask(t.id)} className="p-1 text-red-500 hover:bg-red-50 rounded">
-                          Delete
-                        </button>
+                      <div className="flex gap-2">
+                        {editingID === t.id ? (
+                          <>
+                            {/* Save Button */}
+                            <button 
+                              onClick={() => {
+                                updateTask(t.id, editText);
+                                setEditingID(null);
+                              }}
+                              className="text-xs bg-indigo-600 text-white px-3 py-1 rounded-lg font-bold hover:bg-indigo-700"
+                            >
+                              Save
+                            </button>
+                            {/* Cancel Button */}
+                            <button onClick={() => setEditingID(null)} className="text-xs text-gray-400 hover:text-gray-600">
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                          {/* Toggle Edit Mode */}
+                          <button 
+                            onClick={() => {
+                              setEditingID(t.id);
+                              setEditText(t.title);
+                            }}
+                            className="p-1 text-yellow-600 hover:bg-yellow-50 rounded"
+                          >
+                            Edit
+                          </button>
+                          <button onClick={() => deleteTask(t.id)} className="p-1 text-red-500 hover:bg-red-50 rounded">
+                            Delete
+                          </button>
+                          </>
+                        )}
                       </div>
                     </li>
                   ))
