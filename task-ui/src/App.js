@@ -1,7 +1,7 @@
 /*import logo from './logo.svg';
 import './App.css';
 */
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useCallback } from 'react';
 const API = 'https://task-api-46uc.onrender.com';
 
 function App() {
@@ -11,6 +11,8 @@ function App() {
   const [title, setTitle] = useState("");
   const [tasks, setTasks] = useState([]);
   const [isNewUser, setIsNewUser] = useState(false); // New state for toggling UI
+  const [isLoading, setIsLoading] = useState(false);
+  const [authError, setAuthError] = useState("");
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
@@ -38,6 +40,9 @@ function App() {
 };
   // 🔐 LOGIN
   const login = async () => {
+    setIsLoading(true);
+    setAuthError("");
+    try {
     const res = await fetch(`${API}/login`, {
       method: "POST",
       headers: {
@@ -46,14 +51,19 @@ function App() {
       body: JSON.stringify({ username, password }),
     });
     const data = await res.json();
+
     if (res.ok) {
       setToken(data.acess_token);
       localStorage.setItem("token", data.acess_token); // Save token for persistence
     } else {
-      alert("Login failed check credentials!");
+      setAuthError(data.detail || "Login failed. Check your credentials.");
+    }
+    } catch (error) {
+      setAuthError("Could not connect to server. Please try again later.");
+    } finally {
+      setIsLoading(false);
     }
   };
-
    // ➕ CREATE TASK
   const createTask = async () => {
      await fetch(`${API}/tasks`, {
@@ -92,7 +102,8 @@ function App() {
   };  
 
    // 📋 GET TASKS
-  const getTasks = async () => {
+  const getTasks = useCallback(async () => {
+    try { 
     const res = await fetch(`${API}/tasks`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -100,7 +111,17 @@ function App() {
     });
     const data = await res.json();
     setTasks(data);
-  };
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+  }, [token]);
+
+  useEffect(() => {
+  if (token) {
+    getTasks(); // This triggers the auto-load
+  }
+  }, [token, getTasks]);
+
   // ✅ TOGGLE COMPLETION
   const toggleComplete = async (task) => {
     await fetch(`${API}/tasks/${task.id}`, {
@@ -248,7 +269,13 @@ export default App;
             <h2 className="text-xl font-semibold text-gray-800 text-center">
               {isNewUser ? "Create an Account" : "Welcome Back"}
             </h2>
-            
+
+            {authError && (
+              <div className="text-red-500 text-sm text-center">
+                <p className="text-red-700 text-sm text-center">{authError}</p>
+              </div>
+            )}
+
             <div className="space-y-3">
               <input
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all"
@@ -264,19 +291,32 @@ export default App;
             </div>
 
             {isNewUser ? (
-              <button onClick={signup} className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded-lg transition-colors">
-                Register
+              <button 
+                onClick={signup} 
+                disabled={isLoading}
+                className={`w-full font-bold py-2 rounded-lg transition-colors text-white ${
+                  isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-green-500 hover:bg-green-600"
+                }`}
+              >
+                {isLoading ? "Creating Account..." : "Register"}
               </button>
             ) : (
-              <button onClick={login} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg transition-colors">
-                Login
+              <button 
+                onClick={login} 
+                disabled={isLoading}
+                className={`w-full font-bold py-2 rounded-lg transition-colors text-white ${
+                  isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
+                }`}
+              >
+                {isLoading ? "Signing In..." : "Login"}
               </button>
             )}
 
             <p className="text-center text-sm text-gray-600 pt-2">
               {isNewUser ? "Already have an account?" : "Need an account?"}{" "}
               <button 
-                onClick={() => setIsNewUser(!isNewUser)} 
+                onClick={() =>{ setIsNewUser(!isNewUser); setAuthError("");}} 
+
                 className="text-indigo-600 font-bold hover:underline focus:outline-none"
               >
                 {isNewUser ? "Login here" : "Sign up here"}

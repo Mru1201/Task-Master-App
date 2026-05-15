@@ -98,10 +98,16 @@ def login(user: UserCreate, db: Session = Depends(get_db)):
 	).first()
 
 	if not db_user:
-		return {"error": "User not found"}
+		raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="User not found"
+        )
 
 	if not verify_password(user.password, db_user.password):
-		return {"error": "Wrong password"}
+		raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Wrong password"
+        )
 
 	token = create_token({"user_id": db_user.id})
 	
