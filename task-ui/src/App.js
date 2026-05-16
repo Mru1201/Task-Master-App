@@ -92,9 +92,15 @@ function App() {
       setEditingID(null); // Close the edit mode
       return;
     } 
-    const currentTask = tasks.find(t => t.id === id);
-    await taskApi.updateTask(token, id, newTitle, currentTask ? currentTask.completed : false);
-    getTasks();   // Refresh list automatically
+    const currentTask = tasks.find(t => Number(t.id) === Number(id));
+
+    const originalCompletionStatus = currentTask ? currentTask.completed : false;
+    try {
+      await taskApi.updateTask(token, id, newTitle, originalCompletionStatus);
+      getTasks();   // Refresh list automatically
+    } catch (error) {
+      console.error("Error updating task:", error);
+    }
   };  
 
    // 📋 GET TASKS

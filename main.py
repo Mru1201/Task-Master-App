@@ -141,32 +141,20 @@ def delete_task(task_id: int, user_id: int = Depends(get_current_user), db: Sess
 
 @app.put("/tasks/{task_id}")
 
-def mark_complete(task_id: int, user_id: int = Depends(get_current_user), db: Session = Depends(get_db)):
+def update_task(task_id: int, updated_task: Task, user_id: int = Depends(get_current_user), db: Session = Depends(get_db)):
 	
 	task = db.query(TaskModel).filter(TaskModel.id == task_id, TaskModel.user_id == user_id).first()
 	
 	if not task:
-		return {"error": "Task not found or not yours"}
+		raise HTTPException(status_code=404, detail="Task not found or unauthorized")
 
+	task.title = updated_task.title
 	task.completed = not task.completed 
 	db.commit()
+	db.refresh(task)
  
 	return task
-"""
-def update_task(task_id: int, updated_task: Task, db: Session = Depends(get_db)):
 
-    task = db.query(TaskModel).filter(TaskModel.id == task_id).first()
-
-    if not task:
-
-        return {"error": "Task not found"}
-
-    task.title = updated_task.title
-
-    db.commit()
-
-    return task
-"""
 @app.get("/")
 
 def home():
