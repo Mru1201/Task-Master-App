@@ -1,21 +1,20 @@
-/*import logo from './logo.svg';
-import './App.css';
-*/
 import { useState, useEffect,useCallback } from 'react';
-const API = "https://task-api-46uc.onrender.com"; 
-//const API = "http://127.0.0.1:8000";
+import AuthForm from "./components/AuthForm";
+import TaskDashboard from "./components/TaskDashboard";
+import { taskApi } from "./services/api";
+
 
 function App() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [token, setToken] = useState("");
-  const [title, setTitle] = useState("");
   const [tasks, setTasks] = useState([]);
   const [isNewUser, setIsNewUser] = useState(false); // state for toggling UI
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState("");
   const [editingID, setEditingID] = useState(null); // state to track which task is being edited
   const [editText, setEditText] = useState(""); //  state to hold the edited text
+  const [newTask, setnewTask] = useState(""); // state for new task input
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
@@ -31,94 +30,77 @@ function App() {
   
   // 📝 SIGNUP
   const signup = async () => {
-    const res = await fetch(`${API}/signup`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    });
-  const data = await res.json();
-  if (res.ok) {
-    alert("Signup successful! Please login.");
-    setIsNewUser(false); // TO Show login UI after successful signup
-  } else {
-    alert(`Signup failed: ${data.detail}`);
-  } 
+  try {
+      const { ok, data } = await taskApi.signup(username, password);
+      if (ok) {
+        alert("Signup successful! Please login.");
+        setIsNewUser(false); 
+      } else {
+        alert(`Signup failed: ${data.detail}`);
+      }
+    } catch (error) {
+      alert("Signup request failed. Check server status.");
+    }
+  
 };
   // 🔐 LOGIN
   const login = async () => {
     setIsLoading(true);
     setAuthError("");
     try {
-    const res = await fetch(`${API}/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    });
-    const data = await res.json();
-
-    if (res.ok) {
-      setToken(data.acess_token);
-      localStorage.setItem("token", data.acess_token); // Save token for persistence
-      localStorage.setItem("username", username); // Save username for display
-    } else {
-      setAuthError(data.detail || "Login failed. Check your credentials.");
-    }
-    } catch (error) {
-      setAuthError("Could not connect to server. Please try again later.");
-    } finally {
-      setIsLoading(false);
-    }
+      const { ok, data } = await taskApi.login(username, password);
+      if (ok) {
+        setToken(data.acess_token);
+        localStorage.setItem("token", data.acess_token); // Save token for persistence
+        localStorage.setItem("username", username); // Save username for display
+      } else {
+        setAuthError(data.detail || "Login failed. Check your credentials.");
+      }
+      } catch (error) {
+        setAuthError("Could not connect to server. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
   };
+  
    // ➕ CREATE TASK
   const createTask = async () => {
-     await fetch(`${API}/tasks`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ title }),
-    });
-    setTitle(""); // Clear input
+      if (!newTask.trim()) {
+      alert("Task title cannot be empty!");
+      return; // Stop the function here
+    } 
+    await taskApi.createTask(token, newTask);
+    setnewTask("") // Clear input after adding
     getTasks();   // Refresh list automatically
   };
+  
    // Delete Task
   const deleteTask = async (id) => {
-     await fetch(`${API}/tasks/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    getTasks();   // Refresh list automatically
+    try {
+      await taskApi.deleteTask(token, id);
+      getTasks();   
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
   };
 
   // ✅ UPDATE TASK
+  
   const updateTask = async (id, newTitle) => {
-     await fetch(`${API}/tasks/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ title: newTitle }),
-    });
+    if (!newTitle.trim()) {
+      alert("Task title cannot be empty!");
+      setEditingID(null); // Close the edit mode
+      return;
+    } 
+    const currentTask = tasks.find(t => t.id === id);
+    await taskApi.updateTask(token, id, newTitle, currentTask ? currentTask.completed : false);
     getTasks();   // Refresh list automatically
   };  
 
    // 📋 GET TASKS
   const getTasks = useCallback(async () => {
     try { 
-    const res = await fetch(`${API}/tasks`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const data = await res.json();
+    const data = await taskApi.getTasks(token);
     setTasks(data);
     } catch (error) {
       console.error("Error fetching tasks:", error);
@@ -133,18 +115,7 @@ function App() {
 
   // ✅ TOGGLE COMPLETION
   const toggleComplete = async (task) => {
-    await fetch(`${API}/tasks/${task.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      // Send the title (required by your backend) and the flipped completed status
-      body: JSON.stringify({ 
-        title: task.title, 
-        completed: !task.completed 
-      }),
-    });
+    await taskApi.updateTask(token, task.id, task.title, !task.completed);
     getTasks(); // Refresh list 
   };
   // 🚪 LOGOUT
@@ -157,22 +128,7 @@ function App() {
   };
 
   return (
-   /*<div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>*/
+   
   /*  --- Inline style (Object) approach --- */
   /*
   <div className="App" style={{ padding: 20, fontFamily: 'sans-serif' }}>
@@ -264,9 +220,8 @@ export default App;
 */
 
 /* --- Utility class Tailwind implementation --- */
-
 <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans">
-    <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
+<div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
       {/*HEADER SECTION */ }
       <div className="bg-indigo-600 p-6 text-white text-center">
         <h1 className="text-2xl font-bold tracking-tight">Task Master </h1>
@@ -275,180 +230,45 @@ export default App;
 
       <div className="p-8">
         {!token ? (
-          /* --- AUTH VIEW (Login/Signup) --- */
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-gray-800 text-center">
-              {isNewUser ? "Create an Account" : "Welcome Back"}
-            </h2>
-
-            {authError && (
-              <div className="text-red-500 text-sm text-center">
-                <p className="text-red-700 text-sm text-center">{authError}</p>
-              </div>
-            )}
-
-            <div className="space-y-3">
-              <input
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all"
-                placeholder="Username"
-                onChange={(e) => setUsername(e.target.value)}
-              />
-              <input
-                type="password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all"
-                placeholder="Password"
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-
-            {isNewUser ? (
-              <button 
-                onClick={signup} 
-                disabled={isLoading}
-                className={`w-full font-bold py-2 rounded-lg transition-colors text-white ${
-                  isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-green-500 hover:bg-green-600"
-                }`}
-              >
-                {isLoading ? "Creating Account..." : "Register"}
-              </button>
-            ) : (
-              <button 
-                onClick={login} 
-                disabled={isLoading}
-                className={`w-full font-bold py-2 rounded-lg transition-colors text-white ${
-                  isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
-                }`}
-              >
-                {isLoading ? "Signing In..." : "Login"}
-              </button>
-            )}
-
-            <p className="text-center text-sm text-gray-600 pt-2">
-              {isNewUser ? "Already have an account?" : "Need an account?"}{" "}
-              <button 
-                onClick={() =>{ setIsNewUser(!isNewUser); setAuthError("");}} 
-
-                className="text-indigo-600 font-bold hover:underline focus:outline-none"
-              >
-                {isNewUser ? "Login here" : "Sign up here"}
-              </button>
-            </p>
-          </div>
+            /* --- AUTH VIEW (Login/Signup) --- */
+            <AuthForm
+              username={username}
+              password={password}
+              isNewUser={isNewUser}
+              setIsNewUser={setIsNewUser}
+              setUsername={setUsername}
+              setPassword={setPassword}
+              login={login}
+              signup={signup}
+              isLoading={isLoading}
+              authError={authError}
+              setAuthError={setAuthError}
+            />           
         ) : (
-           /* --- TASK VIEW --- */
-          <div className="space-y-6">
-             {/* User Profile Info */} 
-            <div className="flex justify-between items-center bg-indigo-50 p-3 rounded-lg">
-              <span className="text-gray-700">Hi, <b className="text-indigo-700">{username}</b></span>
-              <button onClick={logout} className="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1 rounded-full font-semibold transition-colors">
-                Logout
-              </button>
-            </div>
-
-            { /* Create Task Input */ }
-            <div className="space-y-2">
-              <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider">New Task</h3>
-              <div className="flex gap-2">
-                <input 
-                  value={title}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                  placeholder="What needs to be done?" 
-                  onChange={(e) => setTitle(e.target.value)} 
-                />
-                <button onClick={createTask} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold transition-transform active:scale-95">
-                  Add
-                </button>
-              </div>
-            </div>
-
-            { /*Task List */}
-            <div className="space-y-3">
-              <div className="flex justify-between items-end border-b pb-2">
-                <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider">Your Tasks</h3>
-                <button onClick={getTasks} className="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
-                  Refresh List
-                </button>
-              </div>
-              
-              <ul className="space-y-2 max-h-60 overflow-y-auto pr-1">
-                {tasks.length === 0 ? (
-                  <p className="text-center text-gray-400 py-4 italic text-sm">No tasks yet. Add one above!</p>
-                ) : (
-                  tasks.map((t) => (
-                    <li key={t.id} className="group flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-transparent hover:border-indigo-200 hover:bg-white transition-all shadow-sm">
-        
-                      <div className="flex items-center gap-3">
-                        {/* Checkbox to mark complete */}
-                        <input 
-                          type="checkbox" 
-                          checked={t.completed} 
-                          onChange={() => toggleComplete(t)}
-                          className="h-4 w-4 text-indigo-600 rounded cursor-pointer"
-                        />
-                       
-                        {editingID === t.id ? (
-                          /* --- INLINE EDIT INPUT --- */
-                          <input 
-                            className="flex-1 px-2 py-1 border border-indigo-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-                            type="text" 
-                            value={editText} 
-                            onChange={(e) => setEditText(e.target.value)}
-                            autoFocus
-                          />
-                        ) : (
-                          /* Strike-through text if t.completed is true */
-                          <span className={`font-medium transition-all ${t.completed ? 'line-through text-gray-400' : 'text-gray-700'}`}>
-                            {t.title}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex gap-2">
-                        {editingID === t.id ? (
-                          <>
-                            {/* Save Button */}
-                            <button 
-                              onClick={() => {
-                                updateTask(t.id, editText);
-                                setEditingID(null);
-                              }}
-                              className="text-xs bg-indigo-600 text-white px-3 py-1 rounded-lg font-bold hover:bg-indigo-700"
-                            >
-                              Save
-                            </button>
-                            {/* Cancel Button */}
-                            <button onClick={() => setEditingID(null)} className="text-xs text-gray-400 hover:text-gray-600">
-                              Cancel
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                          {/* Toggle Edit Mode */}
-                          <button 
-                            onClick={() => {
-                              setEditingID(t.id);
-                              setEditText(t.title);
-                            }}
-                            className="p-1 text-yellow-600 hover:bg-yellow-50 rounded"
-                          >
-                            Edit
-                          </button>
-                          <button onClick={() => deleteTask(t.id)} className="p-1 text-red-500 hover:bg-red-50 rounded">
-                            Delete
-                          </button>
-                          </>
-                        )}
-                      </div>
-                    </li>
-                  ))
-                )}
-              </ul>
-            </div>
-          </div>
-        )}
+            /* --- TASK VIEW --- */
+            <TaskDashboard
+              username={username}
+              logout={logout}
+              title={newTask}
+              setTitle={setnewTask}
+              createTask={createTask}
+              tasks={tasks}
+              getTasks={getTasks}
+              updateTask={updateTask}
+              deleteTask={deleteTask}
+              toggleComplete={toggleComplete}
+              editingID={editingID}
+              setEditingID={setEditingID}
+              editText={editText}
+              setEditText={setEditText}
+            />
+        )}  
       </div>
-    </div>
-  </div>
   
+                
+</div>
+</div>
+
   );
 }
 
