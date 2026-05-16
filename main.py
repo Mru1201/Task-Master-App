@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from passlib.context import CryptContext
 from models import User as UserModel
 from jose import jwt, JWTError
+from jose.exceptions import ExpiredSignatureError
 from datetime import datetime, timedelta
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
@@ -52,14 +53,26 @@ class UserCreate(BaseModel):
 	username: str
 	password: str
 
-
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-
-    token = credentials.credentials  # 👈 this extracts the token automatically
-
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-
-    return payload["user_id"]	
+	token = credentials.credentials
+	try:
+		payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+		user_id: int = payload.get("user_id")
+		if user_id is None:
+			raise HTTPException(status_code=401, detail="Invalid credentials")
+		return user_id
+	except ExpiredSignatureError:
+		# Catch the expiration cleanly and send a 401 back to the frontend
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="Token has expired",
+			headers={"WWW-Authenticate": "Bearer"},
+		)
+	except JWTError:
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="Could not validate credentials",
+		)
 
 class Task(BaseModel):
 	title: str
@@ -149,7 +162,7 @@ def update_task(task_id: int, updated_task: Task, user_id: int = Depends(get_cur
 		raise HTTPException(status_code=404, detail="Task not found or unauthorized")
 
 	task.title = updated_task.title
-	task.completed = not task.completed 
+	task.completed = updated_task.completed 
 	db.commit()
 	db.refresh(task)
  

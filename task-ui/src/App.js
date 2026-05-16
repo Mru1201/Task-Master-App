@@ -92,15 +92,15 @@ function App() {
       setEditingID(null); // Close the edit mode
       return;
     } 
-    const currentTask = tasks.find(t => Number(t.id) === Number(id));
-
-    const originalCompletionStatus = currentTask ? currentTask.completed : false;
+    
     try {
-      await taskApi.updateTask(token, id, newTitle, originalCompletionStatus);
+      await taskApi.updateTask(token, id, newTitle, false);
+      setEditingID(null); // Close the edit mode
       getTasks();   // Refresh list automatically
     } catch (error) {
       console.error("Error updating task:", error);
     }
+
   };  
 
    // 📋 GET TASKS
@@ -110,6 +110,12 @@ function App() {
     setTasks(data);
     } catch (error) {
       console.error("Error fetching tasks:", error);
+
+      if (error.response?.status === 401 || error.message?.includes("401")) {
+      alert("Your session has expired. Please log in again.");
+      localStorage.removeItem("token"); // or whatever key you use
+      setToken(null);
+      }
     }
   }, [token]);
 
