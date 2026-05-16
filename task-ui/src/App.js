@@ -36,10 +36,17 @@ function App() {
         alert("Signup successful! Please login.");
         setIsNewUser(false); 
       } else {
-        alert(`Signup failed: ${data.detail}`);
+        alert(`Signup failed: ${data.detail || "Unknown error"}`);
       }
     } catch (error) {
-      alert("Signup request failed. Check server status.");
+      if (error.response && error.response.data && error.response.data.detail) {
+        alert(`Signup failed: ${error.response.data.detail}`);
+      } else if (error.message) {
+        alert(`Signup failed: ${error.message}`);
+      } else {
+         alert("Signup request failed. Check server status.");
+      }
+      
     }
   
 };

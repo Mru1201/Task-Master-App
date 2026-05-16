@@ -77,6 +77,7 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
 class Task(BaseModel):
 	title: str
 	description: str | None = None
+	completed: bool 
 
 def get_db():
 	db = SessionLocal()
@@ -92,7 +93,13 @@ def startup():
 
 @app.post("/signup")
 def signup(user: UserCreate, db: Session = Depends(get_db)):
-
+	
+	existing_user = db.query(UserModel).filter( UserModel.username == user.username ).first()
+	if existing_user:
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST, 
+			detail="Username already exists"
+		)
 	hashed_password = hash_password(user.password)
 
 	db_user = UserModel(
@@ -103,6 +110,7 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
 	db.commit()
 
 	return {"message": "User created"}
+
 @app.post("/login")
 def login(user: UserCreate, db: Session = Depends(get_db)):
 
