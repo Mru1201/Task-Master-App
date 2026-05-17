@@ -1,47 +1,41 @@
 # Task UI — React Frontend
 
-A responsive frontend application for the Task Management system, built using React. This client interacts with a FastAPI backend to provide authentication and user-specific task management.
+A responsive frontend application for the Task Management system, built using React and Tailwind CSS. This client interacts with a FastAPI backend to provide authentication and user-specific task management.
 
 ---
 
-## 📌 Overview
+## Overview
 
 This frontend allows users to:
 
 - 🔐 Log in using credentials
 - ➕ Create new tasks
 - 📋 View their tasks
+- 🔄 Update tasks
 - 🔄 Interact with a secure backend API using JWT authentication
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
-React (Vercel)       ↓ FastAPI Backend (Render)       ↓ PostgreSQL Database
-
----
-
-## 🚀 Features
-
-- 🔐 User login with JWT authentication
-- 📡 API integration with FastAPI backend
-- ➕ Create tasks
-- 📋 Fetch and display user-specific tasks
-- ⚡ Fast and responsive UI
-- 🌐 Deployed on Vercel
+React (Vercel)       
+              ↓ 
+FastAPI Backend (Render)       
+              ↓ 
+PostgreSQL Database (Render)
 
 ---
 
-## 🧰 Tech Stack
+## Tech Stack & Dependencies
 
-- React (Hooks)
-- JavaScript (ES6+)
-- Fetch API
-- HTML / CSS
+- UI Framework: React (Functional components + Hooks)
+- Styling engine: Tailwind CSS (Utility-first responsive design)
+- HTTP Client: Axios (Interceptors ready for seamless token injection)
+- Authentication Standard: OAuth2Bearer + JWT 
 
 ---
 
-## 🔐 Authentication Flow
+## Authentication Flow
 
 1. User enters credentials
 2. Frontend sends login request
@@ -53,33 +47,7 @@ Authorization: Bearer <token>
 
 ---
 
-## 📡 API Integration
-
-The frontend communicates with the backend via:
-
-(https://task-api-46uc.onrender.com)
-
-Make sure to update the API URL in:
-
-src/App.js
-
----
-
-## ⚙️ Environment Configuration
-
-(Optional improvement)
-
-You can store API URL in a .env file:
-
-REACT_APP_API_URL=[https://your-api.onrender.com](https://task-api-46uc.onrender.com)
-
-Then use:
-
-javascript const API = process.env.REACT_APP_API_URL; 
-
----
-
-## 🧪 Local Development
+## For Local Development
 
 ### Install dependencies
 
@@ -95,7 +63,7 @@ http://localhost:3000
 
 ---
 
-## 🌍 Deployment
+## To access Deployment
 
 The frontend is deployed on Vercel:
 
@@ -103,21 +71,12 @@ The frontend is deployed on Vercel:
 
 ---
 
-## 📁 Project Structure
 
-task-ui/ 
-       │ ├── src/ 
-       │   ├── App.js        # Main UI logic 
-       │   └── index.js      # Entry point 
-       │ ├── public/ 
-       ├ ├── package.json 
-         └── README.md
-
----
 
 ## 🧠 Key Concepts Demonstrated
 
 - React functional components and hooks
+- Tailwind UI integration
 - API integration using Fetch
 - Handling authentication tokens
 - State management in React
@@ -125,9 +84,6 @@ task-ui/
 
 ---
 
-## 🚧 Future Improvements
-
-- Better UI (Tailwind / Material UI)
-- Error handling and validation
-- Loading states
+##  Future Improvements :
+- Please suggest improvements here  :)
 
