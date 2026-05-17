@@ -18,7 +18,11 @@ The system is designed with scalability and production practices in mind, includ
 
 ## 🏗️ Architecture
 
-Client (React / Postman)         ↓ FastAPI Backend (Render)         ↓ PostgreSQL Database (Render)
+Client (React / Postman)         
+            ↓ 
+FastAPI Backend (Render)         
+            ↓ 
+PostgreSQL Database (Render)
 
 ---
 
@@ -82,7 +86,8 @@ Authorization: Bearer <token>
 
 The following environment variables must be set:
 
-SECRET_KEY=your_secret_key DATABASE_URL=your_postgres_connection_string
+SECRET_KEY= your_secret_key 
+DATABASE_URL= your_postgres_connection_string
 
 ---
 
@@ -98,7 +103,7 @@ docker run -p 8000:8000 task-api
 
 ---
 
-## 🧪 Local Development
+##  Local Development
 
 ### Install dependencies
 
@@ -114,27 +119,16 @@ http://localhost:8000/docs
 
 ---
 
-## 🌍 Deployment
+## Deployment
 
 The backend is deployed on Render:
 
-- Hosted API: https://your-api.onrender.com
-- Interactive Docs: https://your-api.onrender.com/docs
+- Hosted API: [https://your-api.onrender.com](https://task-api-46uc.onrender.com)
+- Interactive Docs: [https://your-api.onrender.com/docs][https://task-api-46uc.onrender.com/docs]
 
 ---
 
-## 📁 Project Structure
-
-task-api/ │ 
-├── main.py          # FastAPI application
-├── models.py        # SQLAlchemy models
-├── database.py      # Database configuration 
-├── Dockerfile       # Container configuration
-└── requirements.txt # Dependencies
-
----
-
-## 🧠 Key Concepts Demonstrated
+## Concepts Demonstrated
 
 - REST API design
 - Token-based authentication (JWT)
@@ -146,7 +140,7 @@ task-api/ │
 
 ---
 
-## 🚧 Future Improvements
+##  Improvements to be implemented
 
 - Refresh token mechanism
 - Role-based access control
