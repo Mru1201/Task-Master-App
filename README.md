@@ -56,7 +56,7 @@ DevOps:
 
 ---
 
-## 📡 API Endpoints
+## API Endpoints
 
 | Method | Endpoint        | Description                     |
 |--------|----------------|---------------------------------|
@@ -82,11 +82,12 @@ Authorization: Bearer <token>
 
 ---
 
-## ⚙️ Environment Variables
+## Environment Variables
 
 The following environment variables must be set
 
 SECRET_KEY= your_secret_key 
+
 DATABASE_URL= your_postgres_connection_string
 
 ---
