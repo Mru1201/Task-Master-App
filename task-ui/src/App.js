@@ -15,7 +15,9 @@ function App() {
   const [editingID, setEditingID] = useState(null); // state to track which task is being edited
   const [editText, setEditText] = useState(""); //  state to hold the edited text
   const [newTask, setnewTask] = useState(""); // state for new task input
-
+  const [filter, setFilter] = useState("all"); // state for task filter (all, active, completed)
+  const [sortOrder, setSortOrder] = useState("newest"); // state for sorting order (newest, oldest)
+  
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
     const savedUsername = localStorage.getItem("username");
@@ -273,6 +275,8 @@ export default App;
               createTask={createTask}
               tasks={tasks}
               getTasks={getTasks}
+              filter={filter}
+              setFilter={setFilter}
               updateTask={updateTask}
               deleteTask={deleteTask}
               toggleComplete={toggleComplete}
@@ -280,6 +284,8 @@ export default App;
               setEditingID={setEditingID}
               editText={editText}
               setEditText={setEditText}
+              sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
             />
         )}  
       </div>

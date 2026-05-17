@@ -5,6 +5,10 @@ function TaskDashboard({
     setTitle,
     createTask,
     tasks,
+    filter,
+    sortOrder,
+    setFilter,
+    setSortOrder,
     editingID,
     setEditingID,
     editText,
@@ -14,6 +18,16 @@ function TaskDashboard({
     deleteTask,
     toggleComplete
 }) {
+    const filteredTasks = tasks.filter((task) => {
+        if (filter === "active") return !task.completed;
+        if (filter === "completed") return task.completed;
+        return true; // for "all"
+    });
+    const sortedTasks = [...filteredTasks].sort((a, b) => {
+        if (sortOrder === "newest") return b.id - a.id; // assuming higher ID means newer task
+        if (sortOrder === "oldest") return a.id - b.id;
+        return 0;
+    });
     return (
         <div className="space-y-6">
              {/* User Profile Info */} 
@@ -42,7 +56,47 @@ function TaskDashboard({
                 </button>
               </div>
             </div>
+            {/* --- Task Filter (All, Active, Completed) --- */}
+            <div className="flex gap-2">
+              <button
+                onClick={() =>setFilter("all")}
+                className={`px-3 py-1 rounded ${filter === "all" ? "bg-indigo-600 text-white" : "bg-gray-200"}`}
+              >
+                All
+              </button>
 
+              <button
+                onClick={() => setFilter("active")}
+                className={`px-3 py-1 rounded ${filter === "active" ? "bg-indigo-600 text-white" : "bg-gray-200"}`}
+              >
+                Active
+              </button>
+
+              <button
+                onClick={() => setFilter("completed")}
+                className={`px-3 py-1 rounded ${filter === "completed" ? "bg-indigo-600 text-white" : "bg-gray-200"}`}
+              >
+                Completed
+              </button>
+
+            </div>
+
+            {/* --- Sorting Controls --- */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setSortOrder("newest")}
+                  className={`px-3 py-1 rounded ${sortOrder === "newest" ? "bg-violet-600 text-white" : "bg-gray-200"}`}
+                >
+                  Newest
+                </button>
+                <button
+                  onClick={() => setSortOrder("oldest")}
+                  className={`px-3 py-1 rounded ${sortOrder === "oldest" ? "bg-violet-600 text-white" : "bg-gray-200"}`}
+                >
+                  Oldest
+                </button>
+              </div>   
+              
             { /*Task List */}
             <div className="space-y-3">
               <div className="flex justify-between items-end border-b pb-2">
@@ -51,12 +105,12 @@ function TaskDashboard({
                   Refresh List
                 </button>
               </div>
-              
+
               <ul className="space-y-2 max-h-60 overflow-y-auto pr-1">
                 {tasks.length === 0 ? (
                   <p className="text-center text-gray-400 py-4 italic text-sm">No tasks yet. Add one above!</p>
                 ) : (
-                  tasks.map((t) => (
+                  sortedTasks.map((t) => (
                     <li key={t.id} className="group flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-transparent hover:border-indigo-200 hover:bg-white transition-all shadow-sm">
         
                       <div className="flex items-center gap-3">
