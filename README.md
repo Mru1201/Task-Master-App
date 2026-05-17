@@ -4,7 +4,7 @@ A production-ready backend service for a task management application, built usin
 
 ---
 
-## 📌 Overview
+##  Overview
 
 This project implements a RESTful API that allows users to:
 
@@ -16,9 +16,9 @@ The system is designed with scalability and production practices in mind, includ
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
-Client (React / Postman)         
+Client (React)         
             ↓ 
 FastAPI Backend (Render)         
             ↓ 
@@ -26,7 +26,7 @@ PostgreSQL Database (Render)
 
 ---
 
-## 🚀 Features
+##  Features
 
 - 🔐 JWT-based Authentication
 - 👤 User-specific data isolation
@@ -38,7 +38,7 @@ PostgreSQL Database (Render)
 
 ---
 
-## 🧰 Tech Stack
+## Tech Stack
 
 Backend:
 - FastAPI
@@ -69,7 +69,7 @@ DevOps:
 
 ---
 
-## 🔐 Authentication Flow
+## Authentication Flow
 
 1. User registers via /signup
 2. User logs in via /login
@@ -84,14 +84,14 @@ Authorization: Bearer <token>
 
 ## ⚙️ Environment Variables
 
-The following environment variables must be set:
+The following environment variables must be set
 
 SECRET_KEY= your_secret_key 
 DATABASE_URL= your_postgres_connection_string
 
 ---
 
-## 🐳 Docker Setup
+## Docker Setup
 
 ### Build Image
 
@@ -124,7 +124,7 @@ http://localhost:8000/docs
 The backend is deployed on Render:
 
 - Hosted API: [https://your-api.onrender.com](https://task-api-46uc.onrender.com)
-- Interactive Docs: [https://your-api.onrender.com/docs][https://task-api-46uc.onrender.com/docs]
+- Interactive Docs: [https://your-api.onrender.com/docs](https://task-api-46uc.onrender.com/docs)
 
 ---
 
