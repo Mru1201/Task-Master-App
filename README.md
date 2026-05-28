@@ -1,4 +1,4 @@
-## Task Master Full-Stack App (Monorepo)
+## Task Master Full-Stack App 
 
 A production-ready, full-stack task management ecosystem utilizing a modular monorepo architecture. The project separates concerns into a high-performance Python backend API and a fast, responsive React user interface.
 

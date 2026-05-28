@@ -18,12 +18,14 @@ The system is designed with scalability and production practices in mind, includ
 
 ## Architecture
 
+```text
 Client (React)         
             ↓ 
 FastAPI Backend (Render)         
             ↓ 
 PostgreSQL Database (Render)
 
+```
 ---
 
 ##  Features
@@ -58,15 +60,16 @@ DevOps:
 
 ## API Endpoints
 
-| Method | Endpoint        | Description                     |
-|--------|----------------|---------------------------------|
+```text
+| Method | Endpoint     | Description                     |
+|--------|--------------|---------------------------------|
 | POST   | /signup      | Register a new user             |
 | POST   | /login       | Authenticate user & get token   |
 | GET    | /tasks       | Get all tasks (user-specific)   |
 | POST   | /tasks       | Create a new task               |
 | PUT    | /tasks/{id}  | Update an existing task         |
 | DELETE | /tasks/{id}  | Delete a task                   |
-
+```
 ---
 
 ## Authentication Flow

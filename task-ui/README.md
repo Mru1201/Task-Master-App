@@ -18,12 +18,14 @@ This frontend allows users to:
 
 ## Architecture
 
+```text
 React (Vercel)       
               ↓ 
 FastAPI Backend (Render)       
               ↓ 
 PostgreSQL Database (Render)
 
+```
 ---
 
 ## Tech Stack & Dependencies
